@@ -1,16 +1,17 @@
 package com.example.taskManagerWithLogin.models;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor
 public class User {
     private Long id;
-    private String username, password, email, name, rol;
+    private String username;
+    private String password;
+    private String email;
+    private String name;
+    private String rol;
 }
-

@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Task {
-    private Long taskId, userId;
+    private Long taskId;
+    private Long userId;
     private String name;
     private Status status;
     private LocalDateTime due_date;

@@ -23,7 +23,7 @@ public class UserRepositoryImpl implements UserRepository{
     }
 
     public List<User> findAll() {
-        String sql = "SELECT id, username, email, name, rol FROM users";
+        String sql = "SELECT id, username, password, email, name, rol FROM users";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new User(
                         rs.getLong("id"),
