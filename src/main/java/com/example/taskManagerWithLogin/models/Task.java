@@ -16,4 +16,6 @@ public class Task {
     private String name;
     private Status status;
     private LocalDateTime due_date;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

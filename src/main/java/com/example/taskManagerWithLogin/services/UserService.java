@@ -1,11 +1,12 @@
-package com.example.taskManagerWithLogin.repositories;
+package com.example.taskManagerWithLogin.services;
+
 
 import com.example.taskManagerWithLogin.models.User;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository {
+public interface UserService {
     List<User> findAll();
     Optional<User> findById(Long id);
     Optional<User> findByUsername(String username);
