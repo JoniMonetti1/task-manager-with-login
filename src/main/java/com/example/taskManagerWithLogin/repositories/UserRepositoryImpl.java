@@ -37,13 +37,13 @@ public class UserRepositoryImpl implements UserRepository{
     }
 
     public Optional<User> findById(Long id) {
-        String sql = "SELECT id, username, email, name, rol FROM users WHERE id = ?";
+        String sql = "SELECT id, username, email, name, rol, password FROM users WHERE id = ?";
         List<User> users = jdbcTemplate.query(sql, new Object[]{id}, this::mapRowToUser);
         return users.stream().findFirst();
     }
 
     public Optional<User> findByUsername(String username) {
-        String sql = "SELECT id, username, email, name, rol FROM users WHERE username = ?";
+        String sql = "SELECT id, username, email, name, rol, password FROM users WHERE username = ?";
         List<User> users = jdbcTemplate.query(sql, new Object[]{username}, this::mapRowToUser);
         return users.stream().findFirst();
     }
@@ -77,7 +77,7 @@ public class UserRepositoryImpl implements UserRepository{
         int rowsAffected = jdbcTemplate.update(updateSql, user.getUsername(), user.getPassword(), user.getEmail(), user.getName(), user.getRol(), id);
 
         if (rowsAffected > 0) {
-            String selectSql = "SELECT id, username, email, name, rol FROM users WHERE id = ?";
+            String selectSql = "SELECT id, username, email, name, rol, password FROM users WHERE id = ?";
             return jdbcTemplate.query(selectSql, new Object[]{id}, this::mapRowToUser).stream().findFirst();
         }
 
