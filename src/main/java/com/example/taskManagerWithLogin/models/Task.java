@@ -16,7 +16,7 @@ public class Task {
     private Long userId;
     private String name;
     private Status status;
-    private LocalDateTime due_date;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime dueDate;
 }

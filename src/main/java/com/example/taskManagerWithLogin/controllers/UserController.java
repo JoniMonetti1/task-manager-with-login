@@ -81,4 +81,29 @@ public class UserController {
         }
         return ResponseEntity.ok(tasks);
     }
+
+    @GetMapping("/{id}/tasks/{taskId}")
+    @CrossOrigin
+    public ResponseEntity<Task> findTaskByUserAndTaskId(@PathVariable Long id, @PathVariable Long taskId) {
+        return userService.findTaskByUserAndTaskId(id, taskId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/tasks")
+    @CrossOrigin
+    public ResponseEntity<Task> createTaskByUser(@PathVariable Long id, @RequestBody Task task) {
+        return userService.createTaskByUser(id, task)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @PutMapping("/{id}/tasks/{taskId}")
+    @CrossOrigin
+    public ResponseEntity<Task> updateTaskByUser(@PathVariable Long id, @PathVariable Long taskId, @RequestBody Task task) {
+        return userService.updateTaskByUser(id, taskId, task)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

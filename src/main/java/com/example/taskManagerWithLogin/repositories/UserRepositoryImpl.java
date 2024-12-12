@@ -6,18 +6,18 @@ import com.example.taskManagerWithLogin.models.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository{
+public class UserRepositoryImpl implements UserRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
@@ -109,8 +109,60 @@ public class UserRepositoryImpl implements UserRepository{
     }
 
     @Override
+    public Optional<Task> findTaskByUserAndTaskId(Long id, Long taskId) {
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND tasks.id_task = ?";
+        return jdbcTemplate.query(sql, new Object[]{id, taskId}, this::mapRowToTask).stream().findFirst();
+    }
+
+    @Override
     public Optional<Task> createTaskByUser(Long id, Task task) {
+        Optional<User> user = findById(id);
+        if (user.isPresent()) {
+            String sql = "INSERT INTO tasks(name, status, due_date, id_user) VALUES(?, ?, ?, ?)";
+
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, task.getName());
+                ps.setString(2, task.getStatus().toString());
+                ps.setString(3, task.getDueDate().format(formatter));
+                ps.setLong(4, task.getUserId());
+                return ps;
+            }, keyHolder);
+
+            Number generatedId = keyHolder.getKey();
+            if (generatedId != null) {
+                task.setTaskId(generatedId.longValue());
+                return Optional.of(task);
+            }
+
+            return Optional.empty();
+        }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<Task> updateTaskByUser(Long id, Long taskId, Task task) {
+        Optional<Task> optionalTask = findTaskByUserAndTaskId(id, taskId);
+        if (optionalTask.isPresent()) {
+            String updateSql = "UPDATE tasks SET name = ?, status = ?, due_date = ? WHERE id_task = ?";
+            int rowsAffected = jdbcTemplate.update(updateSql, task.getName(), task.getStatus().toString(), task.getDueDate(), taskId);
+
+            if (rowsAffected > 0) {
+                String selectSql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date FROM tasks WHERE id_task = ?";
+                return jdbcTemplate.query(selectSql, new Object[]{taskId}, this::mapRowToTask).stream().findFirst();
+            }
+
+            return Optional.empty();
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public void deleteTaskByUser(Long id, Long taskId) {
+
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
@@ -124,5 +176,15 @@ public class UserRepositoryImpl implements UserRepository{
         );
     }
 
-
+    private Task mapRowToTask(ResultSet rs, int rowNum) throws SQLException {
+        return new Task(
+                rs.getLong("id_task"),
+                rs.getLong("id_user"),
+                rs.getString("name"),
+                Status.valueOf(rs.getString("status")),
+                rs.getTimestamp("created_at").toLocalDateTime(),
+                rs.getTimestamp("updated_at").toLocalDateTime(),
+                rs.getTimestamp("due_date").toLocalDateTime()
+        );
+    }
 }
