@@ -80,6 +80,11 @@ Content-Type: application/json
   "dueDate": "2024-12-14T00:00:00"
 }
 
+###
+
+DELETE http://localhost:8080/system/api/v1/users/2/tasks/4
+Accept: application/json
+
 
 
 

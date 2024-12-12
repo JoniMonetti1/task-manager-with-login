@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.services;
 
+import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.repositories.UserRepositoryImpl;
@@ -64,5 +65,10 @@ public class UserServiceImpl implements UserService {
 
     public Optional<Task> updateTaskByUser(Long id, Long taskId, Task task) {
         return userRepositoryImpl.updateTaskByUser(id, taskId, task);
+    }
+
+    @Override
+    public void deleteTaskByUser(Long id, Long taskId) throws TaskNotFoundException {
+        userRepositoryImpl.deleteTaskByUser(id, taskId);
     }
 }

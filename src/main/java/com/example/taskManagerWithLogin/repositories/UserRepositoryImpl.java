@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.repositories;
 
+import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Status;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
@@ -161,8 +162,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteTaskByUser(Long id, Long taskId) {
-
+    public void deleteTaskByUser(Long id, Long taskId) throws TaskNotFoundException {
+        String sql = "DELETE FROM tasks WHERE id_task = ? AND id_user = ?";
+        int rowsAffected = jdbcTemplate.update(sql, taskId, id);
+        if (rowsAffected == 0) {
+            throw new TaskNotFoundException("Task not found or does not belong to the user");
+        }
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {

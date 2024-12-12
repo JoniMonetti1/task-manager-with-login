@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.repositories;
 
+import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 
@@ -27,5 +28,5 @@ public interface UserRepository {
 
     Optional<Task> updateTaskByUser(Long id, Long taskId, Task task);
 
-    void deleteTaskByUser(Long id, Long taskId);
+    void deleteTaskByUser(Long id, Long taskId) throws TaskNotFoundException;
 }

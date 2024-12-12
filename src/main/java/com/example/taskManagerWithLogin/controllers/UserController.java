@@ -1,12 +1,15 @@
 package com.example.taskManagerWithLogin.controllers;
 
+import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -105,5 +108,17 @@ public class UserController {
         return userService.updateTaskByUser(id, taskId, task)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @DeleteMapping("/{id}/tasks/{taskId}")
+    @CrossOrigin
+    public ResponseEntity<?> deleteTaskByUser(@PathVariable Long id, @PathVariable Long taskId) {
+        try {
+            userService.deleteTaskByUser(id, taskId);
+            return ResponseEntity.noContent().build();
+        } catch (TaskNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Task not found for the given user"));
+        }
     }
 }
