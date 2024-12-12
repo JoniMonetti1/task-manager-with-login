@@ -86,6 +86,11 @@ DELETE http://localhost:8080/system/api/v1/users/2/tasks/4
 Accept: application/json
 
 
+###
+
+GET http://localhost:8080/system/api/v1/users/2/tasks/filter?status=IN_PROGRESS
+Accept: application/json
+
 
 
 

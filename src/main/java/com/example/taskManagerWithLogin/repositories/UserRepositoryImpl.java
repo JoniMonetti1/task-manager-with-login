@@ -170,6 +170,16 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
+    @Override
+    public List<Task> filterTasksbyStatus(Long id, String status) {
+        if (status == null || status.isEmpty()) {
+            return findAllTasksByUser(id);
+        }
+
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND status = ?";
+        return jdbcTemplate.query(sql, new Object[]{id, status}, this::mapRowToTask);
+    }
+
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
         return new User(
                 rs.getLong("id"),

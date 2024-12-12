@@ -71,4 +71,9 @@ public class UserServiceImpl implements UserService {
     public void deleteTaskByUser(Long id, Long taskId) throws TaskNotFoundException {
         userRepositoryImpl.deleteTaskByUser(id, taskId);
     }
+
+    @Override
+    public List<Task> filterTasksbyStatus(Long id, String status) {
+        return userRepositoryImpl.filterTasksbyStatus(id, status);
+    }
 }

@@ -29,4 +29,6 @@ public interface UserRepository {
     Optional<Task> updateTaskByUser(Long id, Long taskId, Task task);
 
     void deleteTaskByUser(Long id, Long taskId) throws TaskNotFoundException;
+
+    List<Task> filterTasksbyStatus(Long id, String status);
 }

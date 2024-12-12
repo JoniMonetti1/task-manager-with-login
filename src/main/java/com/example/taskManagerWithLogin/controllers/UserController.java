@@ -121,4 +121,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Task not found for the given user"));
         }
     }
+
+
+    @GetMapping("/{id}/tasks/filter")
+    @CrossOrigin
+    public ResponseEntity<List<Task>> filterTasksbyStatus(@PathVariable Long id, @RequestParam(required = false) String status) {
+        List<Task> tasks = userService.filterTasksbyStatus(id, status);
+        if (tasks.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(tasks);
+    }
 }
