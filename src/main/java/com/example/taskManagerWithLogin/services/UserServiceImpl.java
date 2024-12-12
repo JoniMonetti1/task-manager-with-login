@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.services;
 
+import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.repositories.UserRepositoryImpl;
 import org.springframework.stereotype.Service;
@@ -44,5 +45,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public void delete(Long id) {
         userRepositoryImpl.delete(id);
+    }
+
+    @Override
+    public List<Task> findAllTasksByUser(Long id) {
+        return userRepositoryImpl.findAllTasksByUser(id);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.taskManagerWithLogin.services;
 
 
+import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface UserService {
     Optional<User> create(User user);
     Optional<User> update(Long id, User user);
     void delete(Long id);
+    List<Task> findAllTasksByUser(Long id);
 }

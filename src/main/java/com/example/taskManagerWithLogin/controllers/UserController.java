@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.controllers;
 
+import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -67,5 +68,17 @@ public class UserController {
             userService.delete(id);
             return ResponseEntity.noContent().build();
         }
+    }
+
+    //Tasks related endpoints
+
+    @GetMapping("/{id}/tasks")
+    @CrossOrigin
+    public ResponseEntity<List<Task>> findAllTasksByUser(@PathVariable Long id) {
+        List<Task> tasks = userService.findAllTasksByUser(id);
+        if (tasks.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(tasks);
     }
 }

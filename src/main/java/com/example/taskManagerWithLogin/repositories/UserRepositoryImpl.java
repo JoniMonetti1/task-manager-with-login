@@ -1,5 +1,7 @@
 package com.example.taskManagerWithLogin.repositories;
 
+import com.example.taskManagerWithLogin.models.Status;
+import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -87,6 +89,28 @@ public class UserRepositoryImpl implements UserRepository{
     public void delete(Long id) {
         String sql = "DELETE FROM users WHERE id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public List<Task> findAllTasksByUser(Long id) {
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ?";
+        return jdbcTemplate.query(sql, new Object[]{id}, (rs, rowNum) ->
+                new Task(
+                        rs.getLong("id_task"),
+                        rs.getLong("id_user"),
+                        rs.getString("name"),
+                        Status.valueOf(rs.getString("status")),
+                        rs.getTimestamp("created_at").toLocalDateTime(),
+                        rs.getTimestamp("updated_at").toLocalDateTime(),
+                        rs.getTimestamp("due_date").toLocalDateTime()
+
+                )
+        );
+    }
+
+    @Override
+    public Optional<Task> createTaskByUser(Long id, Task task) {
+        return Optional.empty();
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {

@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.repositories;
 
+import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface UserRepository {
     Optional<User> create(User user);
     Optional<User> update(Long id, User user);
     void delete(Long id);
+    List<Task> findAllTasksByUser(Long id);
+    Optional<Task> createTaskByUser(Long id, Task task);
 }
