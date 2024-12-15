@@ -3,6 +3,7 @@ package com.example.taskManagerWithLogin.controllers;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
+import com.example.taskManagerWithLogin.models.UserDTO;
 import com.example.taskManagerWithLogin.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,8 @@ public class UserController {
 
     @GetMapping
     @CrossOrigin
-    public ResponseEntity<List<User>> findAll() {
-        List<User> users = userService.findAll();
+    public ResponseEntity<List<UserDTO>> findAll() {
+        List<UserDTO> users = userService.findAll();
         if (users.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

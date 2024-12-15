@@ -13,11 +13,6 @@ Accept: application/json
 
 ###
 
-GET http://localhost:8080/system/api/v1/users
-Accept: application/json
-
-###
-
 POST http://localhost:8080/system/api/v1/users
 Content-Type: application/json
 
@@ -26,12 +21,12 @@ Content-Type: application/json
   "password": "hashed_password123",
   "email": "jlowkey@gmail.com",
   "name": "jlo",
-  "rol": "USER"
+  "rol": "ROLE_USER"
 }
 
 ###
 
-PUT http://localhost:8080/system/api/v1/users/6
+PUT http://localhost:8080/system/api/v1/users/7
 Content-Type: application/json
 
 {
@@ -39,12 +34,12 @@ Content-Type: application/json
   "password": "hashed_password456",
   "email": "jhighkey@gmail.com",
   "name": "jhi",
-  "rol": "ADMIN"
+  "rol": "ROLE_ADMIN"
 }
 
 ###
 
-DELETE http://localhost:8080/system/api/v1/users/6
+DELETE http://localhost:8080/system/api/v1/users/7
 Accept: application/json
 
 ###
@@ -66,12 +61,12 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8080/system/api/v1/users/2/tasks/4
+GET http://localhost:8080/system/api/v1/users/2/tasks/5
 Accept: application/json
 
 ###
 
-PUT http://localhost:8080/system/api/v1/users/2/tasks/4
+PUT http://localhost:8080/system/api/v1/users/2/tasks/5
 Content-Type: application/json
 
 {
@@ -82,13 +77,13 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:8080/system/api/v1/users/2/tasks/4
+DELETE http://localhost:8080/system/api/v1/users/2/tasks/5
 Accept: application/json
 
 
 ###
 
-GET http://localhost:8080/system/api/v1/users/2/tasks/filter?status=IN_PROGRESS
+GET http://localhost:8080/system/api/v1/users/3/tasks/filter?status=IN_PROGRESS
 Accept: application/json
 
 

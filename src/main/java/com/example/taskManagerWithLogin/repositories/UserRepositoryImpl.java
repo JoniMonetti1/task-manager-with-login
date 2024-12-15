@@ -1,9 +1,7 @@
 package com.example.taskManagerWithLogin.repositories;
 
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
-import com.example.taskManagerWithLogin.models.Status;
-import com.example.taskManagerWithLogin.models.Task;
-import com.example.taskManagerWithLogin.models.User;
+import com.example.taskManagerWithLogin.models.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -25,16 +23,15 @@ public class UserRepositoryImpl implements UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<User> findAll() {
-        String sql = "SELECT id, username, password, email, name, rol FROM users";
+    public List<UserDTO> findAll() {
+        String sql = "SELECT id, username, email, name, rol FROM users";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new User(
+                new UserDTO(
                         rs.getLong("id"),
                         rs.getString("username"),
-                        rs.getString("password"),
                         rs.getString("email"),
                         rs.getString("name"),
-                        rs.getString("rol")
+                        ROLE.valueOf(rs.getString("rol"))
                 )
         );
     }
@@ -62,7 +59,7 @@ public class UserRepositoryImpl implements UserRepository {
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getEmail());
             ps.setString(4, user.getName());
-            ps.setString(5, user.getRol());
+            ps.setString(5, user.getRol().name());
             return ps;
         }, keyHolder);
 
@@ -77,7 +74,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     public Optional<User> update(Long id, User user) {
         String updateSql = "UPDATE users SET username = ?, password = ?, email = ?, name = ?, rol = ? WHERE id = ?";
-        int rowsAffected = jdbcTemplate.update(updateSql, user.getUsername(), user.getPassword(), user.getEmail(), user.getName(), user.getRol(), id);
+        int rowsAffected = jdbcTemplate.update(updateSql, user.getUsername(), user.getPassword(), user.getEmail(), user.getName(), user.getRol().name(), id);
 
         if (rowsAffected > 0) {
             String selectSql = "SELECT id, username, email, name, rol, password FROM users WHERE id = ?";
@@ -187,7 +184,7 @@ public class UserRepositoryImpl implements UserRepository {
                 rs.getString("password"),
                 rs.getString("email"),
                 rs.getString("name"),
-                rs.getString("rol")
+                ROLE.valueOf(rs.getString("rol"))
         );
     }
 
