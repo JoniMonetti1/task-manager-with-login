@@ -5,6 +5,7 @@ import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.models.UserDTO;
+import com.example.taskManagerWithLogin.models.UserRegisterDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,8 @@ public interface UserService {
     Optional<User> findByUsername(String username);
 
     Optional<User> create(User user);
+
+    Optional<User> register(UserRegisterDTO userRegisterDTO);
 
     Optional<User> update(Long id, User user);
 

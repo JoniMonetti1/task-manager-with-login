@@ -4,13 +4,16 @@ import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.models.UserDTO;
+import com.example.taskManagerWithLogin.models.UserRegisterDTO;
 import com.example.taskManagerWithLogin.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -49,15 +52,23 @@ public class UserController {
 
     @PostMapping
     @CrossOrigin
-    public ResponseEntity<User> create(@RequestBody User user) {
+    public ResponseEntity<User> create(@Valid @RequestBody User user) {
         return userService.create(user)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/register")
+    @CrossOrigin
+    public ResponseEntity<User> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+        return userService.register(userRegisterDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @CrossOrigin
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<User> update(@PathVariable Long id,@Valid @RequestBody User user) {
         return userService.update(id, user)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -96,7 +107,7 @@ public class UserController {
 
     @PostMapping("/{id}/tasks")
     @CrossOrigin
-    public ResponseEntity<Task> createTaskByUser(@PathVariable Long id, @RequestBody Task task) {
+    public ResponseEntity<Task> createTaskByUser(@PathVariable Long id, @Valid @RequestBody Task task) {
         return userService.createTaskByUser(id, task)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -105,7 +116,7 @@ public class UserController {
 
     @PutMapping("/{id}/tasks/{taskId}")
     @CrossOrigin
-    public ResponseEntity<Task> updateTaskByUser(@PathVariable Long id, @PathVariable Long taskId, @RequestBody Task task) {
+    public ResponseEntity<Task> updateTaskByUser(@PathVariable Long id, @PathVariable Long taskId, @Valid @RequestBody Task task) {
         return userService.updateTaskByUser(id, taskId, task)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

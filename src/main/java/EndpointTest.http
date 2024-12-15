@@ -26,6 +26,18 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:8080/system/api/v1/users/register
+Content-Type: application/json
+
+{
+  "username": "jlowkeyREGISTER",
+  "password": "hashed_password123",
+  "email": "jlowkeyREGISTER@gmail.com",
+  "name": "jlo"
+}
+
+###
+
 PUT http://localhost:8080/system/api/v1/users/7
 Content-Type: application/json
 

@@ -1,10 +1,7 @@
 package com.example.taskManagerWithLogin.services;
 
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
-import com.example.taskManagerWithLogin.models.ROLE;
-import com.example.taskManagerWithLogin.models.Task;
-import com.example.taskManagerWithLogin.models.User;
-import com.example.taskManagerWithLogin.models.UserDTO;
+import com.example.taskManagerWithLogin.models.*;
 import com.example.taskManagerWithLogin.repositories.UserRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,13 +38,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> create(User user) {
+    public Optional<User> create(User user) { //TODO: Handle when email is duplicated
         if(!EnumSet.allOf(ROLE.class).contains(user.getRol())) {
             return Optional.empty();
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepositoryImpl.create(user);
+    }
+
+    @Override
+    public Optional<User> register(UserRegisterDTO userRegisterDTO) {
+        User user = new User();
+        user.setUsername(userRegisterDTO.getUsername());
+        user.setPassword(userRegisterDTO.getPassword());
+        user.setEmail(userRegisterDTO.getEmail());
+        user.setName(userRegisterDTO.getName());
+        user.setRol(ROLE.ROLE_USER);
+
+        return create(user);
     }
 
     @Override

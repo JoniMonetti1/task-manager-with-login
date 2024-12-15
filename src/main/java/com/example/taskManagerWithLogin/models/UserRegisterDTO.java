@@ -9,16 +9,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    private Long id;
+public class UserRegisterDTO {
     @NotBlank(message = "Username is required")
     private String username;
+
     @NotBlank(message = "Password is required")
     private String password;
+
     @NotBlank(message = "Email is required")
     @Email
     private String email;
+
     @NotBlank(message = "Name is required")
     private String name;
-    private ROLE rol;
 }
