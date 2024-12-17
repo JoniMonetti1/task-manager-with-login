@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -68,7 +67,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @CrossOrigin
-    public ResponseEntity<User> update(@PathVariable Long id,@Valid @RequestBody User user) {
+    public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody User user) {
         return userService.update(id, user)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

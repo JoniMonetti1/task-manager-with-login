@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.models;
 
+import com.example.taskManagerWithLogin.validations.ExistsByUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRegisterDTO {
     @NotBlank(message = "Username is required")
+    @ExistsByUsername
     private String username;
 
     @NotBlank(message = "Password is required")

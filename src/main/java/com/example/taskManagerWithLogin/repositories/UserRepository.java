@@ -21,6 +21,8 @@ public interface UserRepository {
 
     void delete(Long id);
 
+    boolean existsByUsername(String username);
+
     List<Task> findAllTasksByUser(Long id);
 
     Optional<Task> findTaskByUserAndTaskId(Long id, Long taskId);

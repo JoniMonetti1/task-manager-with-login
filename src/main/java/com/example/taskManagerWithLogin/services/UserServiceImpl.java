@@ -70,6 +70,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean existsByUsername(String username) {
+        return userRepositoryImpl.existsByUsername(username);
+    }
+
+    @Override
     public List<Task> findAllTasksByUser(Long id) {
         return userRepositoryImpl.findAllTasksByUser(id);
     }

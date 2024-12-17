@@ -25,6 +25,8 @@ public interface UserService {
 
     void delete(Long id);
 
+    boolean existsByUsername(String username);
+
     List<Task> findAllTasksByUser(Long id);
 
     Optional<Task> findTaskByUserAndTaskId(Long id, Long taskId);

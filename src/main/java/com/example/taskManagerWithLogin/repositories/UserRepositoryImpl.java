@@ -177,6 +177,12 @@ public class UserRepositoryImpl implements UserRepository {
         return jdbcTemplate.query(sql, new Object[]{id, status}, this::mapRowToTask);
     }
 
+    @Override
+    public boolean existsByUsername(String username) {
+        String sql = "SELECT id FROM users WHERE username = ?";
+        return jdbcTemplate.queryForList(sql, String.class).contains(username);
+    }
+
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
         return new User(
                 rs.getLong("id"),
