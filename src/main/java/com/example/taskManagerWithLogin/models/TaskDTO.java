@@ -10,13 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Task {
-    private Long taskId;
-    private Long userId;
+public class TaskDTO {
     @NotBlank(message = "Name is required")
     private String name;
     private Status status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private LocalDateTime dueDate;
 }

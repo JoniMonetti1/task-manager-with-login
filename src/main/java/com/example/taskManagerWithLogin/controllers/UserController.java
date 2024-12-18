@@ -1,10 +1,7 @@
 package com.example.taskManagerWithLogin.controllers;
 
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
-import com.example.taskManagerWithLogin.models.Task;
-import com.example.taskManagerWithLogin.models.User;
-import com.example.taskManagerWithLogin.models.UserDTO;
-import com.example.taskManagerWithLogin.models.UserRegisterDTO;
+import com.example.taskManagerWithLogin.models.*;
 import com.example.taskManagerWithLogin.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -106,8 +103,8 @@ public class UserController {
 
     @PostMapping("/{id}/tasks")
     @CrossOrigin
-    public ResponseEntity<Task> createTaskByUser(@PathVariable Long id, @Valid @RequestBody Task task) {
-        return userService.createTaskByUser(id, task)
+    public ResponseEntity<Task> createTaskByUser(@PathVariable Long id, @Valid @RequestBody TaskDTO taskDTO) {
+        return userService.createTaskByUser(id, taskDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

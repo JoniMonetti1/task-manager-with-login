@@ -2,10 +2,7 @@ package com.example.taskManagerWithLogin.services;
 
 
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
-import com.example.taskManagerWithLogin.models.Task;
-import com.example.taskManagerWithLogin.models.User;
-import com.example.taskManagerWithLogin.models.UserDTO;
-import com.example.taskManagerWithLogin.models.UserRegisterDTO;
+import com.example.taskManagerWithLogin.models.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +28,7 @@ public interface UserService {
 
     Optional<Task> findTaskByUserAndTaskId(Long id, Long taskId);
 
-    Optional<Task> createTaskByUser(Long id, Task task);
+    Optional<Task> createTaskByUser(Long id, TaskDTO taskDTO);
 
     Optional<Task> updateTaskByUser(Long id, Long taskId, Task task);
 

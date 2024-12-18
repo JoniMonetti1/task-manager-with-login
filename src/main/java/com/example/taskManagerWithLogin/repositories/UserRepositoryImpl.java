@@ -24,32 +24,32 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public List<UserDTO> findAll() {
-        String sql = "SELECT id, username, email, name, rol FROM users";
+        String sql = "SELECT id, username, email, name, role FROM users";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
                 new UserDTO(
                         rs.getLong("id"),
                         rs.getString("username"),
                         rs.getString("email"),
                         rs.getString("name"),
-                        ROLE.valueOf(rs.getString("rol"))
+                        ROLE.valueOf(rs.getString("role"))
                 )
         );
     }
 
     public Optional<User> findById(Long id) {
-        String sql = "SELECT id, username, email, name, rol, password FROM users WHERE id = ?";
+        String sql = "SELECT id, username, email, name, role, password, enabled FROM users WHERE id = ?";
         List<User> users = jdbcTemplate.query(sql, new Object[]{id}, this::mapRowToUser);
         return users.stream().findFirst();
     }
 
     public Optional<User> findByUsername(String username) {
-        String sql = "SELECT id, username, email, name, rol, password FROM users WHERE username = ?";
+        String sql = "SELECT id, username, email, name, role, password, enabled FROM users WHERE username = ?";
         List<User> users = jdbcTemplate.query(sql, new Object[]{username}, this::mapRowToUser);
         return users.stream().findFirst();
     }
 
     public Optional<User> create(User user) {
-        String sql = "INSERT INTO users(username, password, email, name, rol) VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users(username, password, email, name, role) VALUES(?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -59,7 +59,7 @@ public class UserRepositoryImpl implements UserRepository {
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getEmail());
             ps.setString(4, user.getName());
-            ps.setString(5, user.getRol().name());
+            ps.setString(5, user.getRole().name());
             return ps;
         }, keyHolder);
 
@@ -73,11 +73,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public Optional<User> update(Long id, User user) {
-        String updateSql = "UPDATE users SET username = ?, password = ?, email = ?, name = ?, rol = ? WHERE id = ?";
-        int rowsAffected = jdbcTemplate.update(updateSql, user.getUsername(), user.getPassword(), user.getEmail(), user.getName(), user.getRol().name(), id);
+        String updateSql = "UPDATE users SET username = ?, password = ?, email = ?, name = ?, role = ?, enabled = ? WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(updateSql, user.getUsername(), user.getPassword(), user.getEmail(), user.getName(), user.getRole().name(), user.isEnabled(), id);
 
         if (rowsAffected > 0) {
-            String selectSql = "SELECT id, username, email, name, rol, password FROM users WHERE id = ?";
+            String selectSql = "SELECT id, username, password, email, name, role, enabled  FROM users WHERE id = ?";
             return jdbcTemplate.query(selectSql, new Object[]{id}, this::mapRowToUser).stream().findFirst();
         }
 
@@ -179,8 +179,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean existsByUsername(String username) {
-        String sql = "SELECT id FROM users WHERE username = ?";
-        return jdbcTemplate.queryForList(sql, String.class).contains(username);
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, username);
+        return count != null && count > 0;
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
@@ -190,7 +191,8 @@ public class UserRepositoryImpl implements UserRepository {
                 rs.getString("password"),
                 rs.getString("email"),
                 rs.getString("name"),
-                ROLE.valueOf(rs.getString("rol"))
+                ROLE.valueOf(rs.getString("role")),
+                rs.getBoolean("enabled")
         );
     }
 

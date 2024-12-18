@@ -17,11 +17,11 @@ POST http://localhost:8080/system/api/v1/users
 Content-Type: application/json
 
 {
-  "username": "jlowkey",
+  "username": "jmiddlekeyyTEST",
   "password": "hashed_password123",
-  "email": "jlowkey@gmail.com",
+  "email": "jmiddlekeyyTEST@gmail.com",
   "name": "jlo",
-  "rol": "ROLE_USER"
+  "role": "ROLE_USER"
 }
 
 ###
@@ -30,28 +30,29 @@ POST http://localhost:8080/system/api/v1/users/register
 Content-Type: application/json
 
 {
-  "username": "jlowkeyREGISTER",
+  "username": "jmiddleREGISTERRRTEST",
   "password": "hashed_password123",
-  "email": "jlowkeyREGISTER@gmail.com",
+  "email": "jmiddleREGISTERRR@gmail.comTEST",
   "name": "jlo"
 }
 
 ###
 
-PUT http://localhost:8080/system/api/v1/users/7
+PUT http://localhost:8080/system/api/v1/users/19
 Content-Type: application/json
 
 {
-  "username": "jhighkey",
+  "username": "jmiddleREGISTERRRTEST",
   "password": "hashed_password456",
-  "email": "jhighkey@gmail.com",
+  "email": "jmiddleREGISTERRR@gmail.comTEST",
   "name": "jhi",
-  "rol": "ROLE_ADMIN"
+  "role": "ROLE_ADMIN",
+  "enabled": true
 }
 
 ###
 
-DELETE http://localhost:8080/system/api/v1/users/7
+DELETE http://localhost:8080/system/api/v1/users/19
 Accept: application/json
 
 ###
@@ -61,24 +62,23 @@ Accept: application/json
 
 ###
 
-POST http://localhost:8080/system/api/v1/users/2/tasks
+POST http://localhost:8080/system/api/v1/users/18/tasks
 Content-Type: application/json
 
 {
-  "name": "Tarea prueba 1",
-  "status": "PENDING",
-  "dueDate": "2024-12-13T00:00:00",
-  "userId": 1
+  "name": "Tarea prueba 16",
+  "status": "DONE",
+  "dueDate": "2024-12-13T00:00:00"
 }
 
 ###
 
-GET http://localhost:8080/system/api/v1/users/2/tasks/5
+GET http://localhost:8080/system/api/v1/users/16/tasks/13
 Accept: application/json
 
 ###
 
-PUT http://localhost:8080/system/api/v1/users/2/tasks/5
+PUT http://localhost:8080/system/api/v1/users/18/tasks/14
 Content-Type: application/json
 
 {
@@ -89,7 +89,7 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:8080/system/api/v1/users/2/tasks/5
+DELETE http://localhost:8080/system/api/v1/users/2/tasks/6
 Accept: application/json
 
 
