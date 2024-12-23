@@ -1,6 +1,7 @@
 package com.example.taskManagerWithLogin.services;
 
 
+import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.*;
 
@@ -18,7 +19,7 @@ public interface UserService {
 
     Optional<User> register(UserRegisterDTO userRegisterDTO);
 
-    Optional<User> update(Long id, User user);
+    Optional<User> update(Long id, User user) throws DuplicateUsernameException;
 
     void delete(Long id);
 

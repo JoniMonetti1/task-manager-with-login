@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.repositories;
 
+import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
@@ -17,7 +18,7 @@ public interface UserRepository {
 
     Optional<User> create(User user);
 
-    Optional<User> update(Long id, User user);
+    Optional<User> update(Long id, User user) throws DuplicateUsernameException;
 
     void delete(Long id);
 

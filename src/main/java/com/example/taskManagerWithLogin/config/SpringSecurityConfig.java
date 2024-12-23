@@ -1,6 +1,7 @@
 package com.example.taskManagerWithLogin.config;
 
 import com.example.taskManagerWithLogin.config.filter.JwtAuthenticationFilter;
+import com.example.taskManagerWithLogin.config.filter.JwtValidationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,7 @@ public class SpringSecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll()) // Allow all requests
                 .addFilter(new JwtAuthenticationFilter(authenticationManager())) // Add JWT authentication filter
+                .addFilter(new JwtValidationFilter(authenticationManager())) // Add JWT validation filter
                 .csrf(csrf -> csrf.disable()) // Disable CSRF protection
                 .httpBasic(Customizer.withDefaults()); // Uses Customizer API for defaults (can be removed if basic authentication is not needed)
 

@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.repositories;
 
+import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.*;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -72,7 +73,14 @@ public class UserRepositoryImpl implements UserRepository {
         return Optional.empty();
     }
 
-    public Optional<User> update(Long id, User user) {
+    public Optional<User> update(Long id, User user) throws DuplicateUsernameException {
+        String checkUsernameSql = "SELECT COUNT(*) FROM users WHERE username = ? AND id != ?";
+        Integer count = jdbcTemplate.queryForObject(checkUsernameSql, Integer.class, user.getUsername(), id);
+
+        if (count > 0) {
+            throw new DuplicateUsernameException("Username '" + user.getUsername() + "' already exists");
+        }
+
         String updateSql = "UPDATE users SET username = ?, password = ?, email = ?, name = ?, role = ?, enabled = ? WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(updateSql, user.getUsername(), user.getPassword(), user.getEmail(), user.getName(), user.getRole().name(), user.isEnabled(), id);
 
@@ -91,7 +99,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<Task> findAllTasksByUser(Long id) {
-        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ?";
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ?";
         return jdbcTemplate.query(sql, new Object[]{id}, (rs, rowNum) ->
                 new Task(
                         rs.getLong("id_task"),
@@ -108,7 +116,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<Task> findTaskByUserAndTaskId(Long id, Long taskId) {
-        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND tasks.id_task = ?";
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND tasks.id_task = ?";
         return jdbcTemplate.query(sql, new Object[]{id, taskId}, this::mapRowToTask).stream().findFirst();
     }
 
@@ -173,7 +181,7 @@ public class UserRepositoryImpl implements UserRepository {
             return findAllTasksByUser(id);
         }
 
-        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND status = ?";
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND status = ?";
         return jdbcTemplate.query(sql, new Object[]{id, status}, this::mapRowToTask);
     }
 

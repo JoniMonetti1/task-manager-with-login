@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.controllers;
 
+import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.*;
 import com.example.taskManagerWithLogin.services.UserService;
@@ -64,7 +65,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @CrossOrigin
-    public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody User user) {
+    public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody User user) throws DuplicateUsernameException {
         return userService.update(id, user)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

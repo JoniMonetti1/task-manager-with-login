@@ -1,5 +1,6 @@
 package com.example.taskManagerWithLogin.services;
 
+import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.*;
 import com.example.taskManagerWithLogin.repositories.UserRepository;
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> update(Long id, User user) {
+    public Optional<User> update(Long id, User user) throws DuplicateUsernameException {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.update(id, user);
     }
