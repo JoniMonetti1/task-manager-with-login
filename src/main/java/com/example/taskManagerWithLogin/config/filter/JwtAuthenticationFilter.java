@@ -11,11 +11,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +29,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        User user = null; //Usuario de la clase Models
-        String username = null;
-        String password = null;
+        User user; //Usuario de la clase Models
+        String username;
+        String password;
 
         try {
             user = new ObjectMapper().readValue(request.getInputStream(), User.class);
@@ -53,9 +51,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authResult.getPrincipal();
         String username = user.getUsername();
-        Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
 
-        Claims claims = Jwts.claims().add("role", roles).build();
+        String role = authResult.getAuthorities()
+                .iterator().next().getAuthority();
+
+        Claims claims = Jwts.claims().add("role", role).build();
 
         String token = Jwts.builder()
                 .subject(username)
