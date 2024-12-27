@@ -107,7 +107,7 @@ public class UserController {
 
     @GetMapping("/{id}/tasks/{taskId}")
     @CrossOrigin
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
     public ResponseEntity<Task> findTaskByUserAndTaskId(@PathVariable Long id, @PathVariable Long taskId) {
         return userService.findTaskByUserAndTaskId(id, taskId)
                 .map(ResponseEntity::ok)
@@ -116,7 +116,7 @@ public class UserController {
 
     @PostMapping("/{id}/tasks")
     @CrossOrigin
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
     public ResponseEntity<Task> createTaskByUser(@PathVariable Long id, @Valid @RequestBody TaskDTO taskDTO) {
         return userService.createTaskByUser(id, taskDTO)
                 .map(ResponseEntity::ok)
@@ -126,7 +126,7 @@ public class UserController {
 
     @PutMapping("/{id}/tasks/{taskId}")
     @CrossOrigin
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
     public ResponseEntity<Task> updateTaskByUser(@PathVariable Long id, @PathVariable Long taskId, @Valid @RequestBody Task task) {
         return userService.updateTaskByUser(id, taskId, task)
                 .map(ResponseEntity::ok)
@@ -136,7 +136,7 @@ public class UserController {
 
     @DeleteMapping("/{id}/tasks/{taskId}")
     @CrossOrigin
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
     public ResponseEntity<?> deleteTaskByUser(@PathVariable Long id, @PathVariable Long taskId) {
         try {
             userService.deleteTaskByUser(id, taskId);
@@ -149,7 +149,7 @@ public class UserController {
 
     @GetMapping("/{id}/tasks/filter")
     @CrossOrigin
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
     public ResponseEntity<List<Task>> filterTasksbyStatus(@PathVariable Long id, @RequestParam(required = false) String status) {
         List<Task> tasks = userService.filterTasksbyStatus(id, status);
         if (tasks.isEmpty()) {
