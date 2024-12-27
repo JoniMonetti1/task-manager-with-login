@@ -7,6 +7,8 @@ import com.example.taskManagerWithLogin.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
+@EnableMethodSecurity
 public class UserController {
     private final UserService userService;
 
@@ -23,6 +26,7 @@ public class UserController {
 
     @GetMapping
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> findAll() {
         List<UserDTO> users = userService.findAll();
         if (users.isEmpty()) {
@@ -33,6 +37,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> findById(@PathVariable Long id) {
         return userService.findById(id)
                 .map(ResponseEntity::ok)
@@ -41,6 +46,7 @@ public class UserController {
 
     @GetMapping("/username/{username}")
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> findByUsername(@PathVariable String username) {
         return userService.findByUsername(username)
                 .map(ResponseEntity::ok)
@@ -49,6 +55,7 @@ public class UserController {
 
     @PostMapping
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> create(@Valid @RequestBody User user) {
         return userService.create(user)
                 .map(ResponseEntity::ok)
@@ -65,6 +72,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody User user) throws DuplicateUsernameException {
         return userService.update(id, user)
                 .map(ResponseEntity::ok)
@@ -73,6 +81,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         if (userService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -86,7 +95,9 @@ public class UserController {
 
     @GetMapping("/{id}/tasks")
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
     public ResponseEntity<List<Task>> findAllTasksByUser(@PathVariable Long id) {
+
         List<Task> tasks = userService.findAllTasksByUser(id);
         if (tasks.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -96,6 +107,7 @@ public class UserController {
 
     @GetMapping("/{id}/tasks/{taskId}")
     @CrossOrigin
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Task> findTaskByUserAndTaskId(@PathVariable Long id, @PathVariable Long taskId) {
         return userService.findTaskByUserAndTaskId(id, taskId)
                 .map(ResponseEntity::ok)
@@ -104,6 +116,7 @@ public class UserController {
 
     @PostMapping("/{id}/tasks")
     @CrossOrigin
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<Task> createTaskByUser(@PathVariable Long id, @Valid @RequestBody TaskDTO taskDTO) {
         return userService.createTaskByUser(id, taskDTO)
                 .map(ResponseEntity::ok)
@@ -113,6 +126,7 @@ public class UserController {
 
     @PutMapping("/{id}/tasks/{taskId}")
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Task> updateTaskByUser(@PathVariable Long id, @PathVariable Long taskId, @Valid @RequestBody Task task) {
         return userService.updateTaskByUser(id, taskId, task)
                 .map(ResponseEntity::ok)
@@ -122,6 +136,7 @@ public class UserController {
 
     @DeleteMapping("/{id}/tasks/{taskId}")
     @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteTaskByUser(@PathVariable Long id, @PathVariable Long taskId) {
         try {
             userService.deleteTaskByUser(id, taskId);
@@ -134,6 +149,7 @@ public class UserController {
 
     @GetMapping("/{id}/tasks/filter")
     @CrossOrigin
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<List<Task>> filterTasksbyStatus(@PathVariable Long id, @RequestParam(required = false) String status) {
         List<Task> tasks = userService.filterTasksbyStatus(id, status);
         if (tasks.isEmpty()) {

@@ -1,4 +1,4 @@
-package com.example.taskManagerWithLogin.config;
+package com.example.taskManagerWithLogin.security;
 
 import io.jsonwebtoken.Jwts;
 

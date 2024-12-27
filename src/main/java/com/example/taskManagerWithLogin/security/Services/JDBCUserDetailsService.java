@@ -1,7 +1,8 @@
-package com.example.taskManagerWithLogin.services;
+package com.example.taskManagerWithLogin.security.Services;
 
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.repositories.UserRepository;
+import com.example.taskManagerWithLogin.security.CustomUserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,16 +29,12 @@ public class JDBCUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
-    private UserDetails mapToUserDetails(User user) {
-        // Map User to Spring Security's UserDetails
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())))
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(!user.isEnabled())
-                .build();
+    private CustomUserDetails mapToUserDetails(User user) {
+        return new CustomUserDetails(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())),
+                user.getId()
+        );
     }
 }

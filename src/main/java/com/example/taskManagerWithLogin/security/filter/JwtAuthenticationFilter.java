@@ -1,6 +1,7 @@
-package com.example.taskManagerWithLogin.config.filter;
+package com.example.taskManagerWithLogin.security.filter;
 
 import com.example.taskManagerWithLogin.models.User;
+import com.example.taskManagerWithLogin.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -18,7 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.taskManagerWithLogin.config.TokenJwtConfig.*;
+import static com.example.taskManagerWithLogin.security.TokenJwtConfig.*;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
@@ -49,13 +50,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
 
-        org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authResult.getPrincipal();
-        String username = user.getUsername();
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
+        String username = userDetails.getUsername();
+        String role = userDetails.getAuthorities().iterator().next().getAuthority();
+        Long userId = userDetails.getId();
 
-        String role = authResult.getAuthorities()
-                .iterator().next().getAuthority();
-
-        Claims claims = Jwts.claims().add("role", role).build();
+        Claims claims = Jwts.claims()
+                .add("role", role)
+                .add("username", username)
+                .add("userId", userId)
+                .build();
 
         String token = Jwts.builder()
                 .subject(username)

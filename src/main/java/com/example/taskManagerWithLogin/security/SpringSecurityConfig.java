@@ -1,10 +1,12 @@
-package com.example.taskManagerWithLogin.config;
+package com.example.taskManagerWithLogin.security;
 
-import com.example.taskManagerWithLogin.config.filter.JwtAuthenticationFilter;
-import com.example.taskManagerWithLogin.config.filter.JwtValidationFilter;
+import com.example.taskManagerWithLogin.security.filter.JwtAuthenticationFilter;
+import com.example.taskManagerWithLogin.security.filter.JwtValidationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -14,6 +16,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import java.util.List;
 
 @Configuration
 public class SpringSecurityConfig {
@@ -34,21 +42,34 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.GET, "/system/api/v1/users", "/system/api/v1/users/{id}", "/system/api/v1/users/username/").hasAnyRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/system/api/v1/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/system/api/v1/users/register").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.PUT, "/system/api/v1/users/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/system/api/v1/users/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/system/api/v1/users/{id}/tasks").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/system/api/v1/users/{id}/tasks/{taskId}", "/system/api/v1/users/{id}/tasks/filter").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/system/api/v1/users/{id}/tasks").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.PUT, "/system/api/v1/users/{id}/tasks/{taskId}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/system/api/v1/users/{id}/tasks/{taskId}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
                         .anyRequest().authenticated())
                 .addFilter(new JwtAuthenticationFilter(authenticationManager())) // Add JWT authentication filter
                 .addFilter(new JwtValidationFilter(authenticationManager())) // Add JWT validation filter
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    @Bean
+    FilterRegistrationBean<CorsFilter> corsFilter() {
+        FilterRegistrationBean<CorsFilter> corsBean = new FilterRegistrationBean<>(new CorsFilter(
+                corsConfigurationSource()));
+        corsBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return corsBean;
     }
 }

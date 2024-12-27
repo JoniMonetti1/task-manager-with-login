@@ -1,5 +1,6 @@
-package com.example.taskManagerWithLogin.config.filter;
+package com.example.taskManagerWithLogin.security.filter;
 
+import com.example.taskManagerWithLogin.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -21,7 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.taskManagerWithLogin.config.TokenJwtConfig.*;
+import static com.example.taskManagerWithLogin.security.TokenJwtConfig.*;
 
 
 public class JwtValidationFilter extends BasicAuthenticationFilter {
@@ -49,14 +50,19 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            String username = claims.get("username", String.class);
+            String username = claims.getSubject();
             String role = claims.get("role", String.class);
+            Long id = claims.get("userId", Long.class);
 
             SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
             Collection<GrantedAuthority> authorities = Collections.singletonList(authority);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            CustomUserDetails userDetails = new CustomUserDetails(username, "", authorities, id);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
             chain.doFilter(request, response);
         } catch (Exception e) {
             Map<String, String> body = new HashMap<>();
