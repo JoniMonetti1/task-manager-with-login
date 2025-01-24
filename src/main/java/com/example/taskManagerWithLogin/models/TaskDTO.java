@@ -15,4 +15,9 @@ public class TaskDTO {
     private String name;
     private Status status;
     private LocalDateTime dueDate;
+    private boolean hasWhatsappReminder;
+
+    public boolean hasWhatsappReminder() {
+        return hasWhatsappReminder;
+    }
 }

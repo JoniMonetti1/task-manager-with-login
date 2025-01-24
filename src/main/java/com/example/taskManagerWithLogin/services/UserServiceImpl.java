@@ -112,11 +112,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.filterTasksbyStatus(id, status);
     }
 
+    public Optional<Task> updateTaskStatus(Long id, Long taskId, String status) {
+        return userRepository.updateTaskStatus(id, taskId, status);
+    }
+
     private Task mapToTask(TaskDTO taskDTO) {
         Task task = new Task();
         task.setName(taskDTO.getName());
         task.setStatus(taskDTO.getStatus());
         task.setDueDate(taskDTO.getDueDate());
+        task.setHasWhatsappReminder(taskDTO.hasWhatsappReminder());
         return task;
     }
 }

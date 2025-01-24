@@ -157,4 +157,13 @@ public class UserController {
         }
         return ResponseEntity.ok(tasks);
     }
+
+    @PutMapping("/{id}/tasks/{taskId}/status")
+    @CrossOrigin
+    @PreAuthorize("hasRole('ADMIN') or @userSecurity.isCurrentUser(#id)")
+    public ResponseEntity<Task> updateTaskStatus(@PathVariable Long id, @PathVariable Long taskId, @RequestBody String status) {
+        return userService.updateTaskStatus(id, taskId, status)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
