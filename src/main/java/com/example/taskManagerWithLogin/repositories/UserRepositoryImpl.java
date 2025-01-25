@@ -155,11 +155,11 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<Task> updateTaskByUser(Long id, Long taskId, Task task) {
         Optional<Task> optionalTask = findTaskByUserAndTaskId(id, taskId);
         if (optionalTask.isPresent()) {
-            String updateSql = "UPDATE tasks SET name = ?, status = ?, due_date = ?, has_whatsapp_reminder = ? WHERE id_task = ?";
-            int rowsAffected = jdbcTemplate.update(updateSql, task.getName(), task.getStatus().toString(), task.getDueDate(), task.hasWhatsappReminder(), taskId);
+            String updateSql = "UPDATE tasks SET name = ?, due_date = ?, status = ?, has_whatsapp_reminder = ? WHERE id_task = ?";
+            int rowsAffected = jdbcTemplate.update(updateSql, task.getName(), task.getDueDate(), task.getStatus().name(), task.hasWhatsappReminder(), taskId);
 
             if (rowsAffected > 0) {
-                String selectSql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, updated_at, due_date, has_whatsapp_reminder FROM tasks WHERE id_task = ?";
+                String selectSql = "SELECT id_task, id_user, tasks.name, tasks.status, tasks.created_at, tasks.updated_at, tasks.due_date, tasks.has_whatsapp_reminder FROM tasks WHERE id_task = ?";
                 return jdbcTemplate.query(selectSql, new Object[]{taskId}, this::mapRowToTask).stream().findFirst();
             }
 
