@@ -4,6 +4,9 @@ package com.example.taskManagerWithLogin.services;
 import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.*;
+import com.example.taskManagerWithLogin.models.dto.TaskDTO;
+import com.example.taskManagerWithLogin.models.dto.UserDTO;
+import com.example.taskManagerWithLogin.models.dto.UserRegisterDTO;
 
 import java.util.List;
 import java.util.Optional;

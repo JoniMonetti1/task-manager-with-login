@@ -4,8 +4,9 @@ import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.Task;
 import com.example.taskManagerWithLogin.models.User;
-import com.example.taskManagerWithLogin.models.UserDTO;
+import com.example.taskManagerWithLogin.models.dto.UserDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,4 +38,6 @@ public interface UserRepository {
     List<Task> filterTasksbyStatus(Long id, String status);
 
     Optional<Task> updateTaskStatus(Long id, Long taskId, String status);
+
+    List<Task> findTaskByDueDateBetweenAndNotificationSentFalse(LocalDateTime start, LocalDateTime end);
 }

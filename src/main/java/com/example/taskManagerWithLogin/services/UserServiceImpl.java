@@ -3,6 +3,9 @@ package com.example.taskManagerWithLogin.services;
 import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.*;
+import com.example.taskManagerWithLogin.models.dto.TaskDTO;
+import com.example.taskManagerWithLogin.models.dto.UserDTO;
+import com.example.taskManagerWithLogin.models.dto.UserRegisterDTO;
 import com.example.taskManagerWithLogin.repositories.UserRepository;
 import com.example.taskManagerWithLogin.repositories.UserRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +124,7 @@ public class UserServiceImpl implements UserService {
         task.setName(taskDTO.getName());
         task.setStatus(taskDTO.getStatus());
         task.setDueDate(taskDTO.getDueDate());
-        task.setHasWhatsappReminder(taskDTO.hasWhatsappReminder());
+        task.setHasEmailReminder(taskDTO.hasWhatsappReminder());
         return task;
     }
 }

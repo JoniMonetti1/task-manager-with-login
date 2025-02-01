@@ -1,4 +1,4 @@
-package com.example.taskManagerWithLogin.models;
+package com.example.taskManagerWithLogin.models.dto;
 
 import lombok.Getter;
 import lombok.Setter;

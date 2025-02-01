@@ -1,5 +1,6 @@
-package com.example.taskManagerWithLogin.models;
+package com.example.taskManagerWithLogin.models.dto;
 
+import com.example.taskManagerWithLogin.models.Status;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,9 +16,9 @@ public class TaskDTO {
     private String name;
     private Status status;
     private LocalDateTime dueDate;
-    private boolean hasWhatsappReminder;
+    private boolean hasEmailReminder;
 
     public boolean hasWhatsappReminder() {
-        return hasWhatsappReminder;
+        return hasEmailReminder;
     }
 }

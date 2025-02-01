@@ -1,4 +1,4 @@
-package com.example.taskManagerWithLogin.models;
+package com.example.taskManagerWithLogin.models.dto;
 
 import com.example.taskManagerWithLogin.validations.ExistsByUsername;
 import jakarta.validation.constraints.Email;

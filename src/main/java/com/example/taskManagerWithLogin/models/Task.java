@@ -21,9 +21,10 @@ public class Task {
     private LocalDateTime updatedAt;
     private LocalDateTime dueDate;
     @Setter
-    private boolean hasWhatsappReminder;
+    private boolean hasEmailReminder;
+    private boolean notificationSent;
 
-    public boolean hasWhatsappReminder() {
-        return hasWhatsappReminder;
+    public boolean hasEmailReminder() {
+        return hasEmailReminder;
     }
 }

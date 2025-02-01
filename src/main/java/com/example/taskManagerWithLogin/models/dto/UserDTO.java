@@ -1,5 +1,6 @@
-package com.example.taskManagerWithLogin.models;
+package com.example.taskManagerWithLogin.models.dto;
 
+import com.example.taskManagerWithLogin.models.ROLE;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

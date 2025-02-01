@@ -3,6 +3,7 @@ package com.example.taskManagerWithLogin.repositories;
 import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
 import com.example.taskManagerWithLogin.models.*;
+import com.example.taskManagerWithLogin.models.dto.UserDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -12,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +101,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<Task> findAllTasksByUser(Long id) {
-        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date, has_whatsapp_reminder FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ?";
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date, tasks.has_email_reminder, notification_sent FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ?";
         return jdbcTemplate.query(sql, new Object[]{id}, (rs, rowNum) ->
                 new Task(
                         rs.getLong("id_task"),
@@ -109,7 +111,8 @@ public class UserRepositoryImpl implements UserRepository {
                         rs.getTimestamp("created_at").toLocalDateTime(),
                         rs.getTimestamp("updated_at").toLocalDateTime(),
                         rs.getTimestamp("due_date").toLocalDateTime(),
-                        rs.getBoolean("has_whatsapp_reminder")
+                        rs.getBoolean("has_email_reminder"),
+                        rs.getBoolean("notification_sent")
 
                 )
         );
@@ -117,7 +120,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<Task> findTaskByUserAndTaskId(Long id, Long taskId) {
-        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date, has_whatsapp_reminder FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND tasks.id_task = ?";
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date, tasks.has_email_reminder, notification_sent FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND tasks.id_task = ?";
         return jdbcTemplate.query(sql, new Object[]{id, taskId}, this::mapRowToTask).stream().findFirst();
     }
 
@@ -125,7 +128,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<Task> createTaskByUser(Long id, Task task) {
         Optional<User> user = findById(id);
         if (user.isPresent()) {
-            String sql = "INSERT INTO tasks(name, status, due_date, id_user, has_whatsapp_reminder) VALUES(?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO tasks(name, status, due_date, id_user, tasks.has_email_reminder, notification_sent) VALUES(?, ?, ?, ?, ?, ?)";
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -136,7 +139,8 @@ public class UserRepositoryImpl implements UserRepository {
                 ps.setString(2, task.getStatus().toString());
                 ps.setString(3, task.getDueDate().format(formatter));
                 ps.setLong(4, task.getUserId());
-                ps.setBoolean(5, task.hasWhatsappReminder());
+                ps.setBoolean(5, task.hasEmailReminder());
+                ps.setBoolean(6, task.isNotificationSent());
                 return ps;
             }, keyHolder);
 
@@ -155,11 +159,11 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<Task> updateTaskByUser(Long id, Long taskId, Task task) {
         Optional<Task> optionalTask = findTaskByUserAndTaskId(id, taskId);
         if (optionalTask.isPresent()) {
-            String updateSql = "UPDATE tasks SET name = ?, due_date = ?, status = ?, has_whatsapp_reminder = ? WHERE id_task = ?";
-            int rowsAffected = jdbcTemplate.update(updateSql, task.getName(), task.getDueDate(), task.getStatus().name(), task.hasWhatsappReminder(), taskId);
+            String updateSql = "UPDATE tasks SET name = ?, due_date = ?, status = ?, tasks.has_email_reminder = ?, notification_sent = ? WHERE id_task = ?";
+            int rowsAffected = jdbcTemplate.update(updateSql, task.getName(), task.getDueDate(), task.getStatus().name(), task.hasEmailReminder(), task.isNotificationSent(), taskId);
 
             if (rowsAffected > 0) {
-                String selectSql = "SELECT id_task, id_user, tasks.name, tasks.status, tasks.created_at, tasks.updated_at, tasks.due_date, tasks.has_whatsapp_reminder FROM tasks WHERE id_task = ?";
+                String selectSql = "SELECT id_task, id_user, tasks.name, tasks.status, tasks.created_at, tasks.updated_at, tasks.due_date, tasks.has_email_reminder, notification_sent FROM tasks WHERE id_task = ?";
                 return jdbcTemplate.query(selectSql, new Object[]{taskId}, this::mapRowToTask).stream().findFirst();
             }
 
@@ -183,7 +187,7 @@ public class UserRepositoryImpl implements UserRepository {
             return findAllTasksByUser(id);
         }
 
-        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date, has_whatsapp_reminder FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND status = ?";
+        String sql = "SELECT id_task, id_user, tasks.name, status, tasks.created_at, tasks.updated_at, due_date, tasks.has_email_reminder FROM tasks JOIN users ON tasks.id_user = users.id WHERE users.id = ? AND status = ?";
         return jdbcTemplate.query(sql, new Object[]{id, status}, this::mapRowToTask);
     }
 
@@ -197,6 +201,17 @@ public class UserRepositoryImpl implements UserRepository {
             return updateTaskByUser(id, taskId, task);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<Task> findTaskByDueDateBetweenAndNotificationSentFalse(LocalDateTime start, LocalDateTime end) {
+        String sql = "SELECT tasks.id_task, tasks.id_user,tasks.name, tasks.status, tasks.created_at, tasks.updated_at, tasks.due_date, tasks.has_email_reminder, tasks.notification_sent " +
+                "FROM tasks " +
+                "JOIN users ON tasks.id_user = users.id " +
+                "WHERE due_date >= ? AND due_date <= ? " +
+                "AND notification_sent = false " +
+                "AND has_email_reminder = true";
+        return jdbcTemplate.query(sql, new Object[]{start, end}, this::mapRowToTask);
     }
 
     @Override
@@ -227,7 +242,8 @@ public class UserRepositoryImpl implements UserRepository {
                 rs.getTimestamp("created_at").toLocalDateTime(),
                 rs.getTimestamp("updated_at").toLocalDateTime(),
                 rs.getTimestamp("due_date").toLocalDateTime(),
-                rs.getBoolean("has_whatsapp_reminder")
+                rs.getBoolean("has_email_reminder"),
+                rs.getBoolean("notification_sent")
         );
     }
 }

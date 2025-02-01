@@ -1,6 +1,6 @@
 package com.example.taskManagerWithLogin.controllers;
 
-import com.example.taskManagerWithLogin.models.TokenValidationRequest;
+import com.example.taskManagerWithLogin.models.dto.TokenValidationRequest;
 import com.example.taskManagerWithLogin.services.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
