@@ -1,9 +1,10 @@
 package com.example.taskManagerWithLogin.security.filter;
 
 import com.example.taskManagerWithLogin.security.CustomUserDetails;
+import com.example.taskManagerWithLogin.security.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,12 +28,17 @@ import static com.example.taskManagerWithLogin.security.TokenJwtConfig.*;
 
 public class JwtValidationFilter extends BasicAuthenticationFilter {
 
-    public JwtValidationFilter(AuthenticationManager authenticationManager) {
+    private final JwtUtils jwtUtils;
+
+    public JwtValidationFilter(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         super(authenticationManager);
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain) throws IOException, ServletException {
         String header = request.getHeader(HEADER_AUTHORIZATION);
 
         if (header == null || !header.startsWith(PREFIX_TOKEN)) {
@@ -44,15 +50,15 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
 
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(SECRET_KEY)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            Claims claims = jwtUtils.validateToken(token);
 
             String username = claims.getSubject();
             String role = claims.get("role", String.class);
             Long id = claims.get("userId", Long.class);
+
+            if (username == null || role == null || id == null) {
+                throw new JwtException("Missing claims in token");
+            }
 
             SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role);
             Collection<GrantedAuthority> authorities = Collections.singletonList(authority);

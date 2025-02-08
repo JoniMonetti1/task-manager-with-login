@@ -25,6 +25,8 @@ public interface UserRepository {
 
     boolean existsByUsername(String username);
 
+    boolean existsByEmail(String email);
+
     List<Task> findAllTasksByUser(Long id);
 
     Optional<Task> findTaskByUserAndTaskId(Long id, Long taskId);

@@ -2,7 +2,8 @@ package com.example.taskManagerWithLogin.controllers;
 
 import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
-import com.example.taskManagerWithLogin.models.*;
+import com.example.taskManagerWithLogin.models.Task;
+import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.models.dto.TaskDTO;
 import com.example.taskManagerWithLogin.models.dto.UserDTO;
 import com.example.taskManagerWithLogin.models.dto.UserRegisterDTO;
@@ -14,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,10 +69,11 @@ public class UserController {
 
     @PostMapping("/register")
     @CrossOrigin
-    public ResponseEntity<User> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
         return userService.register(userRegisterDTO)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(token -> ResponseEntity.ok(Collections.singletonMap("token", token)))
+                .orElseGet(() -> ResponseEntity.badRequest()
+                        .body(Collections.singletonMap("error", "Username or email already exists")));
     }
 
     @PutMapping("/{id}")

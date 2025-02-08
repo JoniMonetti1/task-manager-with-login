@@ -2,7 +2,10 @@ package com.example.taskManagerWithLogin.repositories;
 
 import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
-import com.example.taskManagerWithLogin.models.*;
+import com.example.taskManagerWithLogin.models.ROLE;
+import com.example.taskManagerWithLogin.models.Status;
+import com.example.taskManagerWithLogin.models.Task;
+import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.models.dto.UserDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -73,6 +76,12 @@ public class UserRepositoryImpl implements UserRepository {
         }
 
         return Optional.empty();
+    }
+
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return count != null && count > 0;
     }
 
     public Optional<User> update(Long id, User user) throws DuplicateUsernameException {

@@ -1,47 +1,39 @@
 package com.example.taskManagerWithLogin.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 @Component
 public class JwtUtils {
 
     private final SecretKey secretKey;
+    private final long expirationMs = 3600000;
 
     public JwtUtils() {
         this.secretKey = TokenJwtConfig.SECRET_KEY;
     }
 
-    public Map<String, Object> validateToken(String token) {
-        Map<String, Object> response = new HashMap<>();
+    public String generateToken(String username, String role, long id) {
+        return Jwts.builder()
+                .subject(username)
+                .claim("role", role)
+                .claim("userId", id)
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
+                .issuedAt(new Date())
+                .signWith(secretKey)
+                .compact();
+    }
 
-        try {
-            Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parse(token);
-
-            String[] chunks = token.split("\\.");
-            Base64.Decoder decoder = Base64.getDecoder();
-
-            String header = new String(decoder.decode(chunks[0]));
-            String payload = new String(decoder.decode(chunks[1]));
-
-            response.put("isValid", true);
-            response.put("header", header);
-            response.put("payload", payload);
-
-            return response;
-        } catch (Exception e) {
-            response.put("isValid", false);
-            response.put("error", e.getMessage());
-            return response;
-        }
+    public Claims validateToken(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 }

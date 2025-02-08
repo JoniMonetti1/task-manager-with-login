@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -40,17 +41,35 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter,
+                                                   JwtValidationFilter jwtValidationFilter) throws Exception {
         return http.authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/system/api/v1/mail/sendMessage").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .addFilter(new JwtAuthenticationFilter(authenticationManager())) // Add JWT authentication filter
-                .addFilter(new JwtValidationFilter(authenticationManager())) // Add JWT validation filter
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtValidationFilter, JwtAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF protection
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(
+            AuthenticationManager authenticationManager,
+            JwtUtils jwtUtils
+    ) {
+        return new JwtAuthenticationFilter(authenticationManager, jwtUtils);
+    }
+
+    @Bean
+    public JwtValidationFilter jwtValidationFilter(
+            AuthenticationManager authenticationManager,
+            JwtUtils jwtUtils
+    ) {
+        return new JwtValidationFilter(authenticationManager, jwtUtils);
     }
 
     @Bean

@@ -2,15 +2,20 @@ package com.example.taskManagerWithLogin.services;
 
 import com.example.taskManagerWithLogin.exceptions.DuplicateUsernameException;
 import com.example.taskManagerWithLogin.exceptions.TaskNotFoundException;
-import com.example.taskManagerWithLogin.models.*;
+import com.example.taskManagerWithLogin.models.ROLE;
+import com.example.taskManagerWithLogin.models.Task;
+import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.models.dto.TaskDTO;
 import com.example.taskManagerWithLogin.models.dto.UserDTO;
 import com.example.taskManagerWithLogin.models.dto.UserRegisterDTO;
 import com.example.taskManagerWithLogin.repositories.UserRepository;
 import com.example.taskManagerWithLogin.repositories.UserRepositoryImpl;
+import com.example.taskManagerWithLogin.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -19,13 +24,14 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    UserRepository userRepository;
-
+    private final JwtUtils jwtUtils;
+    private final UserRepository userRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepositoryImpl userRepository) {
+    public UserServiceImpl(UserRepositoryImpl userRepository, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -44,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> create(User user) { //TODO: Handle when email is duplicated
+    public Optional<User> create(User user) {
         if (!EnumSet.allOf(ROLE.class).contains(user.getRole())) {
             return Optional.empty();
         }
@@ -55,7 +61,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> register(UserRegisterDTO userRegisterDTO) {
+    public Optional<String> register(UserRegisterDTO userRegisterDTO) {
+
+        if (userRepository.existsByEmail(userRegisterDTO.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+        }
+
         User user = new User();
         user.setUsername(userRegisterDTO.getUsername());
         user.setPassword(userRegisterDTO.getPassword());
@@ -63,7 +74,13 @@ public class UserServiceImpl implements UserService {
         user.setName(userRegisterDTO.getName());
         user.setRole(ROLE.ROLE_USER);
 
-        return create(user);
+        create(user);
+
+        return Optional.of(jwtUtils.generateToken(
+                user.getUsername(),
+                user.getRole().name(),
+                user.getId()
+        ));
     }
 
     @Override

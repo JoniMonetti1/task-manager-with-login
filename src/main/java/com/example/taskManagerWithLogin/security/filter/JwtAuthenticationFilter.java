@@ -2,9 +2,8 @@ package com.example.taskManagerWithLogin.security.filter;
 
 import com.example.taskManagerWithLogin.models.User;
 import com.example.taskManagerWithLogin.security.CustomUserDetails;
+import com.example.taskManagerWithLogin.security.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,17 +14,17 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.taskManagerWithLogin.security.TokenJwtConfig.*;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+        super(authenticationManager);
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -44,37 +43,29 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
 
-        return authenticationManager.authenticate(authenticationToken);
+        return getAuthenticationManager().authenticate(authenticationToken);
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authResult
+    ) throws IOException {
 
         CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
-        String username = userDetails.getUsername();
-        String role = userDetails.getAuthorities().iterator().next().getAuthority();
-        Long userId = userDetails.getId();
-
-        Claims claims = Jwts.claims()
-                .add("role", role)
-                .add("username", username)
-                .add("userId", userId)
-                .build();
-
-        String token = Jwts.builder()
-                .subject(username)
-                .claims(claims)
-                .expiration(new Date(System.currentTimeMillis() + 3600000)) //current time + 1 hour
-                .issuedAt(new Date())
-                .signWith(SECRET_KEY)
-                .compact();
+        String token = jwtUtils.generateToken(
+                userDetails.getUsername(),
+                userDetails.getAuthorities().iterator().next().getAuthority(),
+                userDetails.getId()
+        );
 
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
 
         Map<String, String> body = new HashMap<>();
         body.put("token", token);
-        body.put("username", username);
-        body.put("message", String.format("Welcome %s", username));
+        body.put("username", userDetails.getUsername());
+        body.put("message", String.format("Welcome %s", userDetails.getUsername()));
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(body));
         response.setContentType(CONTENT_TYPE);
