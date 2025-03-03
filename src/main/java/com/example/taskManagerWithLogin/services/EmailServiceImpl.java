@@ -51,4 +51,22 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void sendHtmlEmail(String[] toUser, String subject, String message) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
+
+            mimeMessageHelper.setFrom(emailUser);
+            mimeMessageHelper.setTo(toUser);
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setText(message, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException  e) {
+            throw new RuntimeException("Failed to send HTML email", e);
+        }
+
+    }
 }

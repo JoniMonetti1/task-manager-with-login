@@ -58,10 +58,42 @@ public class TaskNotificationScheduler {
 
                     if (user.isPresent() && user.get().getEmail() != null) {
                         String subject = "Recordatorio: una de tus tareas esta proxima a vencer";
-                        String message = "Hola " + user.get().getUsername() + ",\nLa tarea " + task.getName() + " esta proxima a vencer. Por favor revisa tu lista de tareas.";
+                        String message =
+                                "<html>" +
+                                        "<head>" +
+                                        "  <style>" +
+                                        "    body { font-family: 'Helvetica', Arial, sans-serif; line-height: 1.6; color: #333333; }" +
+                                        "    .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eeeeee; border-radius: 5px; }" +
+                                        "    .header { background-color: #4A6FFF; color: white; padding: 15px; border-radius: 5px 5px 0 0; text-align: center; }" +
+                                        "    .content { padding: 20px; background-color: #ffffff; }" +
+                                        "    .task-name { font-weight: bold; color: #4A6FFF; }" +
+                                        "    .footer { font-size: 12px; text-align: center; margin-top: 20px; color: #999999; }" +
+                                        "    .button { display: inline-block; background-color: #4A6FFF; color: white; padding: 10px 20px; " +
+                                        "      text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 15px; }" +
+                                        "  </style>" +
+                                        "</head>" +
+                                        "<body>" +
+                                        "  <div class='container'>" +
+                                        "    <div class='header'>" +
+                                        "      <h2>⏰ Recordatorio de Tarea</h2>" +
+                                        "    </div>" +
+                                        "    <div class='content'>" +
+                                        "      <p>Hola <b>" + user.get().getName() + "</b>,</p>" +
+                                        "      <p>Tu tarea <span class='task-name'>" + task.getName() + "</span> está próxima a vencer.</p>" +
+                                        "      <p>Por favor revisa tu lista de tareas y actualiza el estado de la misma.</p>" +
+                                        "      <center><a href='recuerdito.io' class='button'>Ver mis tareas</a></center>" +
+                                        "    </div>" +
+                                        "    <div class='footer'>" +
+                                        "      <p>Este es un mensaje automático, por favor no respondas a este correo.</p>" +
+                                        "      <p>© " + java.time.Year.now().getValue() + " TaskManager. Todos los derechos reservados.</p>" +
+                                        "    </div>" +
+                                        "  </div>" +
+                                        "</body>" +
+                                        "</html>";
 
                         logger.debug("Sending email to {} for task {}", user.get().getEmail(), task.getTaskId());
-                        emailService.sendEmail(new String[]{user.get().getEmail()}, subject, message);
+
+                        emailService.sendHtmlEmail(new String[]{user.get().getEmail()}, subject, message);
 
                         task.setNotificationSent(true);
                         logger.debug("Updating task {} notification status", task.getTaskId());
